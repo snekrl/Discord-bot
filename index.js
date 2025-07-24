@@ -12,23 +12,15 @@ const client = new Client({
 
 client.once(Events.ClientReady, bot => {
 	console.log(`logged in as ${bot.user.tag}`);
-
-	const ping = new SlashCommandBuilder()
-		.setName("ping")
-		.setDescription("pings the bot, replies with pong")
-	
-	const pingCommand = ping.toJSON();
-	client.application.commands.create(pingCommand, guildId);
 });
 
-client.on(Events.InteractionCreate, Interaction => {
-	if(!Interaction.isChatInputCommand()) return;
-	if(Interaction.commandName === "ping"){
-		Interaction.reply("pong");
-	}
-	console.log(Interaction)
-})
+client.on("interactionCreate", (interaction) => {
+	if (!interaction.isChatInputCommand()) return;
 
+	if (interaction.commandName === "queue"){
+		interaction.reply("queue");
+	}
+});
 
 client.on("messageCreate", (message) => {
 	if (message.author.bot) return;
@@ -43,6 +35,5 @@ client.on("messageCreate", (message) => {
 		message.reply(`<@${snekId}>`);
 	}
 });
-
 
 client.login(token);
