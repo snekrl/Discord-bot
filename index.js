@@ -22,6 +22,30 @@ client.on("interactionCreate", (interaction) => {
 	}
 });
 
+client.on("interactionCreate", (interaction) => {
+	if (!interaction.isChatInputCommand()) return;
+
+	if (interaction.commandName === "report"){
+		const GameID = interaction.options.get(`ID`).value;
+		const GameResult = interaction.options.get(`Result`).value;
+
+		interaction.reply(`Game ${GameID} reported successfully!`);
+	}
+});
+
+client.on("interactionCreate", (interaction) => {
+	if (!interaction.isChatInputCommand()) return;
+
+	if (interaction.commandName === "add"){
+		const num1 = interaction.options.get(`n1`).value;
+		const num2 = interaction.options.get(`n2`).value;
+
+		interaction.reply(`the sum is ${num1 + num2}`);
+	}
+});
+
+
+
 client.on("messageCreate", (message) => {
 	if (message.author.bot) return;
 	if (message.content.toLowerCase().includes("siege")) {
