@@ -1,11 +1,10 @@
 const { token, guildId, clientId } = require('./config.json');
-console.log("TOKEN is:", token);
 const { REST, Routes } = require("discord.js")
 
 const commands = [
     {
-        name: "hey",
-        description: "replies with hey",
+        name: "queue",
+        description: "Join the queue",
     },
 ];
 
