@@ -1,10 +1,61 @@
 const { token, guildId, clientId } = require('./config.json');
-const { REST, Routes } = require("discord.js")
+const { REST, Routes, ApplicationCommandOptionType } = require("discord.js")
 
 const commands = [
     {
         name: "queue",
         description: "Join the queue",
+    },
+
+
+    {
+        name: "report",
+        description: "Report the score",
+        options: [
+            {
+                name: "id",
+                description: "Input the match ID that you want to report.",
+                type: ApplicationCommandOptionType.Number,
+                required: true,
+            },
+            {
+                name: "result",
+                description: "Select if you won or lost the match.",
+                type: ApplicationCommandOptionType.String,
+                choices: [
+                    {
+                        name: "Won",
+                        value: "Won",
+                    },
+                    {
+                        name: "Lost",
+                        value: "Lost",
+                    },
+                ],
+                required: true,
+            },
+        ],
+    },
+
+
+    {
+        name: "add",
+        description: "adds 2 numbers",
+        options: [
+            {
+                name: "n1",
+                description: "the first",
+                type: ApplicationCommandOptionType.Number,
+                required: true,
+            },
+            {
+                name: "n2",
+                description: "the ssnknd n",
+                type: ApplicationCommandOptionType.Number,
+                required: true,
+            },
+            
+        ],
     },
 ];
 
