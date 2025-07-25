@@ -35,18 +35,18 @@ client.on("interactionCreate", async (interaction) => {
             const queueID = generateUniqueQueueID();
 
             let maxPlayers = 10;
-            if (format === "1 Mans") maxPlayers = 1;
+            // if (format === "1 Mans") maxPlayers = 1; // for testing
             if (format === "10 Mans") maxPlayers = 10;
             if (format === "6 Mans") maxPlayers = 6;
             if (format === "4 Mans") maxPlayers = 4;
 
             queues.set(queueID, {
                 format,
-                users: [],
+                maxPlayers,
                 users: [user.id],
             });
 
-			const queue = queues.get(queueID).users;
+			const users = queues.get(queueID).users;
 
 			const embed = new EmbedBuilder()
                 .setTitle(`Queue #${queueID} (${format})`)
@@ -78,7 +78,7 @@ client.on("interactionCreate", async (interaction) => {
             }
 
             if (queue.users.length >= queue.maxPlayers) {
-                await interaction.reply({ content: `Queue #${queueID} is full!)`, ephemeral: true });
+                await interaction.reply({ content: `Queue #${queueID} is full! (${queue.maxPlayers} players)`, ephemeral: true });
                 return;
             }
 
