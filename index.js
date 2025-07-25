@@ -27,6 +27,7 @@ const queues = new Map();
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
         const { commandName, options, user } = interaction;
+        const format = options.getString("format");
 
         // /create-a-queue
         if (commandName === "create-a-queue") {
@@ -36,11 +37,12 @@ client.on("interactionCreate", async (interaction) => {
             queues.set(queueID, {
                 format,
                 users: [],
+                
             });
 
-			    const queue = queues.get(queueID);
-    			const users = queue.users;
-				interaction.user = queue.users.push(user.id);
+			const queue = queues.get(queueID);
+    		const users = queue.users;
+			interaction.user = queue.users.push(user.id);
 
 			const embed = new EmbedBuilder()
                 .setTitle(`Queue #${queueID} (${format})`)
@@ -57,10 +59,15 @@ client.on("interactionCreate", async (interaction) => {
         }
 
         // /queue
-        else if (commandName === "queue") {
+        else if (commandName === "join-a-queue") {
             const queueID = options.getInteger("id");
-
             const queue = queues.get(queueID);
+
+            queues.set(queueID, {
+                format,
+                users: [],
+                
+            });
             if (!queue) {
                 await interaction.reply({ content: `Queue #${queueID} doesn't exist.`, ephemeral: true });
                 return;
@@ -71,13 +78,37 @@ client.on("interactionCreate", async (interaction) => {
                 return;
             }
 
-            queue.users.push(user.id);
+            if (format === "1 Mans") {
+                queue.users.length = 1
+
+                if(queue.users.length > 1){
+                    await interaction.reply({content: "The queue is full!"});
+                    return;
+                }
+                else if(queue.users.length < 1){
+                    queue.users.push(user.id);
+                    
+                }
+            }
+            
+            if (format === "10 Mans") {
+                queue.users.length = 10
+            }
+
+            if (format === "6 Mans") {
+                queue.users.length = 6
+            }
+
+            if (format === "4 Mans") {
+                queue.users.length = 4
+            }
+
 
             const embed = new EmbedBuilder()
                 .setTitle(`Queue #${queueID} (${queue.format})`)
                 .setDescription(`Total players: ${queue.users.length}`)
                 .addFields({
-                    name: "Players",
+                    name: "Current players in the queue",
                     value: queue.users.map((uid, i) => `${i + 1}. <@${uid}>`).join("\n")
                 });
 
@@ -96,6 +127,19 @@ client.on("interactionCreate", async (interaction) => {
             if (GameResult === "Lost") console.log("User lost the game.");
 
             await interaction.reply(`Game ${GameID} reported as **${GameResult}**.`);
+
+            const embed = new EmbedBuilder()
+                .setTitle(`Queue #${queueID} (${queue.format})`)
+                .setDescription(`Game report.`)
+                .addFields({
+                    name: "Result:",
+                    value: "test"
+                });
+
+            await interaction.reply({
+                content: `Game #${GameID} has been reported.`,
+                embeds: [embed],
+            });
         }
     }
 

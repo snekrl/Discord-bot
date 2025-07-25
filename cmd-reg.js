@@ -13,13 +13,14 @@ const commands = [
                 { name: "10 Mans", value: "10 Mans" },
                 { name: "6 Mans", value: "6 Mans" },
                 { name: "4 Mans", value: "4 Mans" },
+                { name: "1 Mans", value: "1 Mans" },
                 ],
                 required: true,
             },
         ],
     },
     {
-        name: "queue",
+        name: "join-a-queue",
         description: "Join an active queue",
         options: [
             {
