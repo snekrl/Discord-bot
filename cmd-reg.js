@@ -25,7 +25,7 @@ const commands = [
             {
                 name: "id",
                 description: "select or enter which queue you want to join",
-                type: ApplicationCommandOptionType.Number,
+                type: ApplicationCommandOptionType.Integer,
                 required: true,
                 autocomplete: true
             },

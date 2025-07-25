@@ -10,6 +10,10 @@ const client = new Client({
     ]
 });
 
+client.once(Events.ClientReady, bot => {
+    console.log(`Logged in as ${bot.user.tag}`);
+});
+
 function generateUniqueQueueID() {
     let id;
     do {
@@ -19,12 +23,6 @@ function generateUniqueQueueID() {
 }
 
 const queues = new Map();
-
-client.once(Events.ClientReady, bot => {
-    console.log(`Logged in as ${bot.user.tag}`);
-});
-
-
 
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
@@ -40,21 +38,36 @@ client.on("interactionCreate", async (interaction) => {
                 users: [],
             });
 
-            await interaction.reply(`Queue #${queueID} created (${format})`);
+			    const queue = queues.get(queueID);
+    			const users = queue.users;
+				interaction.user = queue.users.push(user.id);
+
+			const embed = new EmbedBuilder()
+                .setTitle(`Queue #${queueID} (${format})`)
+                .setDescription(`Total players: ${users.length}`)
+                .addFields({
+                    name: "Current players in the queue",
+                    value: users.map((uid, i) => `${i + 1}. <@${uid}>`).join("\n"),
+                });
+			
+			await interaction.reply({
+					content: `Queue #${queueID} created (${format})`,
+        			embeds: [embed],
+			});
         }
 
         // /queue
         else if (commandName === "queue") {
-            const id = options.getInteger("id");
+            const queueID = options.getInteger("id");
 
-            const queue = queues.get(id);
+            const queue = queues.get(queueID);
             if (!queue) {
-                await interaction.reply({ content: `Queue #${id} doesn't exist.`, ephemeral: true });
+                await interaction.reply({ content: `Queue #${queueID} doesn't exist.`, ephemeral: true });
                 return;
             }
 
             if (queue.users.includes(user.id)) {
-                await interaction.reply({ content: `You're already in queue #${id}.`, ephemeral: true });
+                await interaction.reply({ content: `You're already in queue #${queueID}.`, ephemeral: true });
                 return;
             }
 
@@ -89,16 +102,16 @@ client.on("interactionCreate", async (interaction) => {
     // Autocomplete handler
     else if (interaction.isAutocomplete()) {
         const focused = interaction.options.getFocused();
-        const choices = [...queues.entries()].map(([id, q]) => ({
-            name: `#${id} (${q.format})`,
-            value: id,
+        const choices = [...queues.entries()].map(([queueID, q]) => ({
+            name: `#${queueID} (${q.format})`,
+            value: queueID,
         }));
 
         const filtered = choices.filter(choice =>
             choice.name.toLowerCase().includes(focused.toString())
         );
 
-        await interaction.respond(filtered.slice(0, 25));
+        await interaction.respond(filtered.slice(0, 5));
     }
 });
 
