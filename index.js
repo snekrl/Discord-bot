@@ -69,18 +69,6 @@ client.on("interactionCreate", (interaction) => {
 	}
 });
 
-client.on("interactionCreate", (interaction)=> {
-	if(!interaction.isChatInputCommand()) return;
-	
-	if (interaction.commandName === "embed") 
-	{
-		const embed = new EmbedBuilder()
-		.setTitle("embed title")
-		.setDescription("yes");
-
-		interaction.reply({embeds: [embed]});
-	}
-});
 
 client.on("interactionCreate", (interaction) => {
 	if (!interaction.isChatInputCommand()) return;

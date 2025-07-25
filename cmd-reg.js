@@ -8,12 +8,6 @@ const commands = [
     },
 
     {
-        name: "embed",
-        description: "yes",
-    },
-
-
-    {
         name: "report",
         description: "Report the score",
         options: [
