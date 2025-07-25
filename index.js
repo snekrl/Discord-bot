@@ -1,6 +1,6 @@
 const ping = require('./commands/ping.js');
 const { token, guildId, snekId } = require('./config.json');
-const {Client, Events, GatewayIntentBits, SlashCommandBuilder, IntentsBitField } = require("discord.js");
+const {Client, Events, GatewayIntentBits, SlashCommandBuilder, IntentsBitField, EmbedBuilder, Embed } = require("discord.js");
 
 const client = new Client({ 
 	intents: [
@@ -14,11 +14,25 @@ client.once(Events.ClientReady, bot => {
 	console.log(`logged in as ${bot.user.tag}`);
 });
 
-client.on("interactionCreate", (interaction) => {
+client.on("interactionCreate", async (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 
 	if (interaction.commandName === "queue"){
-		interaction.reply("queue");
+        const user = interaction.user;
+        console.log(`${user.tag} joined the queue.`);
+        await interaction.reply(`${user.globalName} joined the queue!`);
+
+		const embed = new EmbedBuilder()
+		.setTitle("Current queue")
+		.setDescription(`Current number of players in queue ${user}`);
+		.addFields(
+		{ name: 'Regular field title', value: 'Some value here' },
+		{ name: '\u200B', value: '\u200B' },
+		{ name: 'Inline field title', value: 'Some value here', inline: true },
+		{ name: 'Inline field title', value: 'Some value here', inline: true },
+		)
+		interaction.reply({embeds: [embed]});
+
 	}
 });
 
@@ -26,10 +40,35 @@ client.on("interactionCreate", (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 
 	if (interaction.commandName === "report"){
-		const GameID = interaction.options.get(`ID`).value;
-		const GameResult = interaction.options.get(`Result`).value;
+		const GameID = interaction.options.get(`id`).value;
+		const GameResult = interaction.options.get(`result`).value;
+
+		if (GameResult === "Won") {
+			console.log("cool")
+		}
+
+		if (GameResult === "Lost") {
+			console.log("cool")
+		}
+		
+		if (GameID === "2") {
+			console.log("cssssssssssssssssssssssssssss")
+		}
 
 		interaction.reply(`Game ${GameID} reported successfully!`);
+	}
+});
+
+client.on("interactionCreate", (interaction)=> {
+	if(!interaction.isChatInputCommand()) return;
+	
+	if (interaction.commandName === "embed") 
+	{
+		const embed = new EmbedBuilder()
+		.setTitle("embed title")
+		.setDescription("yes");
+
+		interaction.reply({embeds: [embed]});
 	}
 });
 

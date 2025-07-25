@@ -7,6 +7,11 @@ const commands = [
         description: "Join the queue",
     },
 
+    {
+        name: "embed",
+        description: "yes",
+    },
+
 
     {
         name: "report",
@@ -46,12 +51,24 @@ const commands = [
                 name: "n1",
                 description: "the first",
                 type: ApplicationCommandOptionType.Number,
+                choices: [
+                    {
+                        name: "one",
+                        value: 1,
+                    },
+                ],
                 required: true,
             },
             {
                 name: "n2",
                 description: "the ssnknd n",
                 type: ApplicationCommandOptionType.Number,
+                choices: [ 
+                    {
+                        name: "two",
+                        value: 2,
+                    },
+                ],
                 required: true,
             },
             
