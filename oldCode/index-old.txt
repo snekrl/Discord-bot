@@ -1,5 +1,6 @@
 const { Client, Events, GatewayIntentBits, IntentsBitField, EmbedBuilder, ApplicationCommandOptionType } = require("discord.js");
-const { token } = require("./config.json");
+const { token } = require("../config.json");
+const eventHandler = require("./src/handlers/evenHandler.js");
 
 const client = new Client({
     intents: [
@@ -9,6 +10,14 @@ const client = new Client({
         IntentsBitField.Flags.MessageContent,
     ]
 });
+
+eventHandler(client);
+
+
+
+
+
+
 
 client.once(Events.ClientReady, bot => {
     console.log(`Logged in as ${bot.user.tag}`);
@@ -101,13 +110,13 @@ client.on("interactionCreate", async (interaction) => {
 
         // /report
         else if (commandName === "report") {
-            const GameID = options.getInteger("id");
+            const queueID = options.getInteger("id");
             const GameResult = options.getString("result");
 
             if (GameResult === "Won") console.log("User won the game.");
             if (GameResult === "Lost") console.log("User lost the game.");
 
-            await interaction.reply(`Game ${GameID} reported as **${GameResult}**.`);
+            await interaction.reply(`Game ${queueID} reported as **${GameResult}**.`);
 
             const embed = new EmbedBuilder()
                 .setTitle(`Queue #${queueID} (${queue.format})`)
@@ -118,7 +127,7 @@ client.on("interactionCreate", async (interaction) => {
                 });
 
             await interaction.reply({
-                content: `Game #${GameID} has been reported.`,
+                content: `Game #${queueID} has been reported.`,
                 embeds: [embed],
             });
         }
@@ -128,8 +137,16 @@ client.on("interactionCreate", async (interaction) => {
             const queueID = options.getInteger("id");
             const queue = queues.get(queueID);
 
-            if (!queue.users.includes(user.id)) {
-                await interaction.reply({ content: `You are not in a queue!`, ephemeral: true });
+
+            if (!queue) {
+                await interaction.reply({ content: `Queue #${queueID} doesn't exist.`, ephemeral: true });
+                return;
+            }
+
+            const users = queue.users;
+
+            if (!users.includes(user.id)) {
+                await interaction.reply({ content: `You are not in queue #${queueID}.`, ephemeral: true });
                 return;
             }
 
@@ -140,7 +157,7 @@ client.on("interactionCreate", async (interaction) => {
                 .setDescription(`You left the queue!`)
 
             await interaction.reply({
-                content: `User ${user.id} has left the queue #${GameID} (${queue.format}).`,
+                content: `User ${user.id} has left the queue #${queueID} (${queue.format}).`,
                 embeds: [embed],
             });
         }
