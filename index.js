@@ -74,7 +74,7 @@ client.on("interactionCreate", async (interaction) => {
             queue.users.push(user.id);
 
             const embed = new EmbedBuilder()
-                .setTitle(`Queue #${id} (${queue.format})`)
+                .setTitle(`Queue #${queueID} (${queue.format})`)
                 .setDescription(`Total players: ${queue.users.length}`)
                 .addFields({
                     name: "Players",
@@ -82,7 +82,7 @@ client.on("interactionCreate", async (interaction) => {
                 });
 
             await interaction.reply({
-                content: `${user.globalName || user.username} joined queue #${id}`,
+                content: `${user.globalName || user.username} joined queue #${queueID}`,
                 embeds: [embed],
             });
         }
