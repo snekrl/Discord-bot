@@ -34,15 +34,19 @@ client.on("interactionCreate", async (interaction) => {
             const format = options.getString("format");
             const queueID = generateUniqueQueueID();
 
+            let maxPlayers = 10;
+            if (format === "1 Mans") maxPlayers = 1;
+            if (format === "10 Mans") maxPlayers = 10;
+            if (format === "6 Mans") maxPlayers = 6;
+            if (format === "4 Mans") maxPlayers = 4;
+
             queues.set(queueID, {
                 format,
                 users: [],
-                
+                users: [user.id],
             });
 
-			const queue = queues.get(queueID);
-    		const users = queue.users;
-			interaction.user = queue.users.push(user.id);
+			const queue = queues.get(queueID).users;
 
 			const embed = new EmbedBuilder()
                 .setTitle(`Queue #${queueID} (${format})`)
@@ -58,16 +62,11 @@ client.on("interactionCreate", async (interaction) => {
 			});
         }
 
-        // /queue
+        // /join-a-queue
         else if (commandName === "join-a-queue") {
             const queueID = options.getInteger("id");
             const queue = queues.get(queueID);
 
-            queues.set(queueID, {
-                format,
-                users: [],
-                
-            });
             if (!queue) {
                 await interaction.reply({ content: `Queue #${queueID} doesn't exist.`, ephemeral: true });
                 return;
@@ -78,30 +77,12 @@ client.on("interactionCreate", async (interaction) => {
                 return;
             }
 
-            if (format === "1 Mans") {
-                queue.users.length = 1
-
-                if(queue.users.length > 1){
-                    await interaction.reply({content: "The queue is full!"});
-                    return;
-                }
-                else if(queue.users.length < 1){
-                    queue.users.push(user.id);
-                    
-                }
-            }
-            
-            if (format === "10 Mans") {
-                queue.users.length = 10
+            if (queue.users.length >= queue.maxPlayers) {
+                await interaction.reply({ content: `Queue #${queueID} is full! (${queue.maxPlayers} players)`, ephemeral: true });
+                return;
             }
 
-            if (format === "6 Mans") {
-                queue.users.length = 6
-            }
-
-            if (format === "4 Mans") {
-                queue.users.length = 4
-            }
+            queue.users.push(user.id);
 
 
             const embed = new EmbedBuilder()
