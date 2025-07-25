@@ -78,7 +78,7 @@ client.on("interactionCreate", async (interaction) => {
             }
 
             if (queue.users.length >= queue.maxPlayers) {
-                await interaction.reply({ content: `Queue #${queueID} is full! (${queue.maxPlayers} players)`, ephemeral: true });
+                await interaction.reply({ content: `Queue #${queueID} is full!)`, ephemeral: true });
                 return;
             }
 
