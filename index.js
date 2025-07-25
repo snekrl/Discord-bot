@@ -47,7 +47,7 @@ client.on("interactionCreate", async (interaction) => {
                 .setDescription(`Total players: ${users.length}`)
                 .addFields({
                     name: "Current players in the queue",
-                    value: users.map((uid, i) => `${i + 1}. <@${uid}>`).join("\n"),
+                    value: users.map((uid) => `<@${uid}>`).join(),
                 });
 			
 			await interaction.reply({
@@ -67,7 +67,7 @@ client.on("interactionCreate", async (interaction) => {
             }
 
             if (queue.users.includes(user.id)) {
-                await interaction.reply({ content: `You're already in queue #${queueID}.`, ephemeral: true });
+                await interaction.reply({ content: `You are already in this queue #${queueID}!`, ephemeral: true });
                 return;
             }
 
@@ -82,7 +82,7 @@ client.on("interactionCreate", async (interaction) => {
                 });
 
             await interaction.reply({
-                content: `${user.globalName || user.username} joined queue #${queueID}`,
+                content: `<@${user.id}> joined queue #${queueID}`,
                 embeds: [embed],
             });
         }

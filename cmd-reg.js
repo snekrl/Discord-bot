@@ -39,18 +39,17 @@ const commands = [
             {
                 name: "id",
                 description: "Input the match ID that you want to report.",
-                type: ApplicationCommandOptionType.Number,
+                type: ApplicationCommandOptionType.Integer,
                 required: true,
+                autocomplete: true
             },
             {
                 name: "result",
                 description: "Select if you won or lost the match.",
                 type: ApplicationCommandOptionType.String,
                 choices: [
-                    {
-                        name: "Won", value: "Won",
-                        name: "Lost", value: "Lost",
-                    },
+                { name: "Won", value: "Won" },
+                { name: "Lost", value: "Lost" },
                 ],
                 required: true,
             },
