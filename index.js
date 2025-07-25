@@ -1,100 +1,103 @@
-const ping = require('./commands/ping.js');
-const { token, guildId, snekId } = require('./config.json');
-const {Client, Events, GatewayIntentBits, SlashCommandBuilder, IntentsBitField, EmbedBuilder, Embed } = require("discord.js");
+const { Client, Events, GatewayIntentBits, IntentsBitField, EmbedBuilder, ApplicationCommandOptionType } = require("discord.js");
+const { token } = require("./config.json");
 
-const client = new Client({ 
-	intents: [
-		GatewayIntentBits.Guilds,
-    	IntentsBitField.Flags.GuildMembers,
-    	IntentsBitField.Flags.GuildMessages,
-    	IntentsBitField.Flags.MessageContent,
-	] });
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+        IntentsBitField.Flags.GuildMembers,
+        IntentsBitField.Flags.GuildMessages,
+        IntentsBitField.Flags.MessageContent,
+    ]
+});
+
+function generateUniqueQueueID() {
+    let id;
+    do {
+        id = Math.floor(10000 + Math.random() * 90000); // random 5-digit number between 10000 and 99999
+    } while (queues.has(id));
+    return id;
+}
+
+const queues = new Map();
 
 client.once(Events.ClientReady, bot => {
-	console.log(`logged in as ${bot.user.tag}`);
+    console.log(`Logged in as ${bot.user.tag}`);
 });
 
-const queue = [];
 client.on("interactionCreate", async (interaction) => {
-	if (!interaction.isChatInputCommand()) return;
+    if (interaction.isChatInputCommand()) {
+        const { commandName, options, user } = interaction;
 
-	if (interaction.commandName === "queue") {
-        const user = interaction.user;
+        // /create-a-queue
+        if (commandName === "create-a-queue") {
+            const format = options.getString("format");
+            const queueID = generateUniqueQueueID();
 
-        if (queue.includes(user.id)) {
-            await interaction.reply({
-                content: `${user.globalName || user.username}, you're already in the queue!`,
-                ephemeral: true
+            queues.set(queueID, {
+                format,
+                users: [],
             });
-            return;
+
+            await interaction.reply(`Queue #${queueID} created (${format})`);
         }
 
-        queue.push(user.id);
-        console.log(`${user.tag} joined the queue.`);
+        // /queue
+        else if (commandName === "queue") {
+            const id = options.getInteger("id");
 
-        const queueList = queue.map((id, index) => `${index + 1}. <@${id}>`).join("\n");
+            const queue = queues.get(id);
+            if (!queue) {
+                await interaction.reply({ content: `Queue #${id} doesn't exist.`, ephemeral: true });
+                return;
+            }
 
-        const embed = new EmbedBuilder()
-            .setTitle("Current Queue")
-            .setDescription(`Total players in queue: ${queue.length}`)
-            .addFields({ name: 'Players currently in Queue', value: queueList });
+            if (queue.users.includes(user.id)) {
+                await interaction.reply({ content: `You're already in queue #${id}.`, ephemeral: true });
+                return;
+            }
 
-        await interaction.reply({
-            content: `${user.globalName || user.username} joined the queue!`,
-            embeds: [embed]
-        });
-	}
-});
+            queue.users.push(user.id);
 
-client.on("interactionCreate", (interaction) => {
-	if (!interaction.isChatInputCommand()) return;
+            const embed = new EmbedBuilder()
+                .setTitle(`Queue #${id} (${queue.format})`)
+                .setDescription(`Total players: ${queue.users.length}`)
+                .addFields({
+                    name: "Players",
+                    value: queue.users.map((uid, i) => `${i + 1}. <@${uid}>`).join("\n")
+                });
 
-	if (interaction.commandName === "report"){
-		const GameID = interaction.options.get(`id`).value;
-		const GameResult = interaction.options.get(`result`).value;
+            await interaction.reply({
+                content: `${user.globalName || user.username} joined queue #${id}`,
+                embeds: [embed],
+            });
+        }
 
-		if (GameResult === "Won") {
-			console.log("cool")
-		}
+        // /report
+        else if (commandName === "report") {
+            const GameID = options.getInteger("id");
+            const GameResult = options.getString("result");
 
-		if (GameResult === "Lost") {
-			console.log("cool")
-		}
-		
-		if (GameID === "2") {
-			console.log("cssssssssssssssssssssssssssss")
-		}
+            if (GameResult === "Won") console.log("User won the game.");
+            if (GameResult === "Lost") console.log("User lost the game.");
 
-		interaction.reply(`Game ${GameID} reported successfully!`);
-	}
-});
+            await interaction.reply(`Game ${GameID} reported as **${GameResult}**.`);
+        }
+    }
 
+    // Autocomplete handler
+    else if (interaction.isAutocomplete()) {
+        const focused = interaction.options.getFocused();
+        const choices = [...queues.entries()].map(([id, q]) => ({
+            name: `#${id} (${q.format})`,
+            value: id,
+        }));
 
-client.on("interactionCreate", (interaction) => {
-	if (!interaction.isChatInputCommand()) return;
+        const filtered = choices.filter(choice =>
+            choice.name.toLowerCase().includes(focused.toString())
+        );
 
-	if (interaction.commandName === "add"){
-		const num1 = interaction.options.get(`n1`).value;
-		const num2 = interaction.options.get(`n2`).value;
-
-		interaction.reply(`the sum is ${num1 + num2}`);
-	}
-});
-
-
-
-client.on("messageCreate", (message) => {
-	if (message.author.bot) return;
-	if (message.content.toLowerCase().includes("siege")) {
-		message.reply(`<@${snekId}>`);
-	}
-});
-
-client.on("messageCreate", (message) => {
-	if (message.author.bot) return;
-	if (message.content.toLowerCase().includes("r6")) {
-		message.reply(`<@${snekId}>`);
-	}
+        await interaction.respond(filtered.slice(0, 25));
+    }
 });
 
 client.login(token);

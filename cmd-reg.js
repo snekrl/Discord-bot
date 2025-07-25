@@ -3,8 +3,33 @@ const { REST, Routes, ApplicationCommandOptionType } = require("discord.js")
 
 const commands = [
     {
+        name: "create-a-queue",
+        description: "Create a queue",
+        options: [{
+                name: "format",
+                description: "Select the match format",
+                type: ApplicationCommandOptionType.String,
+                choices: [
+                { name: "10 Mans", value: "10 Mans" },
+                { name: "6 Mans", value: "6 Mans" },
+                { name: "4 Mans", value: "4 Mans" },
+                ],
+                required: true,
+            },
+        ],
+    },
+    {
         name: "queue",
-        description: "Join the queue",
+        description: "Join an active queue",
+        options: [
+            {
+                name: "id",
+                description: "select or enter which queue you want to join",
+                type: ApplicationCommandOptionType.Number,
+                required: true,
+                autocomplete: true
+            },
+        ],
     },
 
     {
@@ -33,39 +58,6 @@ const commands = [
                 ],
                 required: true,
             },
-        ],
-    },
-
-
-    {
-        name: "add",
-        description: "adds 2 numbers",
-        options: [
-            {
-                name: "n1",
-                description: "the first",
-                type: ApplicationCommandOptionType.Number,
-                choices: [
-                    {
-                        name: "one",
-                        value: 1,
-                    },
-                ],
-                required: true,
-            },
-            {
-                name: "n2",
-                description: "the ssnknd n",
-                type: ApplicationCommandOptionType.Number,
-                choices: [ 
-                    {
-                        name: "two",
-                        value: 2,
-                    },
-                ],
-                required: true,
-            },
-            
         ],
     },
 ];
