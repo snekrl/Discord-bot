@@ -14,25 +14,35 @@ client.once(Events.ClientReady, bot => {
 	console.log(`logged in as ${bot.user.tag}`);
 });
 
+const queue = [];
 client.on("interactionCreate", async (interaction) => {
 	if (!interaction.isChatInputCommand()) return;
 
-	if (interaction.commandName === "queue"){
+	if (interaction.commandName === "queue") {
         const user = interaction.user;
+
+        if (queue.includes(user.id)) {
+            await interaction.reply({
+                content: `${user.globalName || user.username}, you're already in the queue!`,
+                ephemeral: true
+            });
+            return;
+        }
+
+        queue.push(user.id);
         console.log(`${user.tag} joined the queue.`);
-        await interaction.reply(`${user.globalName} joined the queue!`);
 
-		const embed = new EmbedBuilder()
-		.setTitle("Current queue")
-		.setDescription(`Current number of players in queue ${user}`);
-		.addFields(
-		{ name: 'Regular field title', value: 'Some value here' },
-		{ name: '\u200B', value: '\u200B' },
-		{ name: 'Inline field title', value: 'Some value here', inline: true },
-		{ name: 'Inline field title', value: 'Some value here', inline: true },
-		)
-		interaction.reply({embeds: [embed]});
+        const queueList = queue.map((id, index) => `${index + 1}. <@${id}>`).join("\n");
 
+        const embed = new EmbedBuilder()
+            .setTitle("Current Queue")
+            .setDescription(`Total players in queue: ${queue.length}`)
+            .addFields({ name: 'Players currently in Queue', value: queueList });
+
+        await interaction.reply({
+            content: `${user.globalName || user.username} joined the queue!`,
+            embeds: [embed]
+        });
 	}
 });
 
