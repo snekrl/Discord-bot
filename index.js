@@ -122,6 +122,28 @@ client.on("interactionCreate", async (interaction) => {
                 embeds: [embed],
             });
         }
+
+        // /leave
+        else if (commandName === "leave") {
+            const queueID = options.getInteger("id");
+            const queue = queues.get(queueID);
+
+            if (!queue.users.includes(user.id)) {
+                await interaction.reply({ content: `You are not in a queue!`, ephemeral: true });
+                return;
+            }
+
+            queue.users = queue.users.filter(uid => uid !== user.id);
+
+            const embed = new EmbedBuilder()
+                .setTitle(`Queue #${queueID} (${queue.format})`)
+                .setDescription(`You left the queue!`)
+
+            await interaction.reply({
+                content: `User ${user.id} has left the queue #${GameID} (${queue.format}).`,
+                embeds: [embed],
+            });
+        }
     }
 
     // Autocomplete handler
