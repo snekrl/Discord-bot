@@ -48,12 +48,8 @@ const commands = [
                 type: ApplicationCommandOptionType.String,
                 choices: [
                     {
-                        name: "Won",
-                        value: "Won",
-                    },
-                    {
-                        name: "Lost",
-                        value: "Lost",
+                        name: "Won", value: "Won",
+                        name: "Lost", value: "Lost",
                     },
                 ],
                 required: true,

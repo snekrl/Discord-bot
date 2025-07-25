@@ -13,7 +13,7 @@ const client = new Client({
 function generateUniqueQueueID() {
     let id;
     do {
-        id = Math.floor(10000 + Math.random() * 90000); // random 5-digit number between 10000 and 99999
+        id = Math.floor(10000 + Math.random() * 90000);
     } while (queues.has(id));
     return id;
 }
@@ -23,6 +23,8 @@ const queues = new Map();
 client.once(Events.ClientReady, bot => {
     console.log(`Logged in as ${bot.user.tag}`);
 });
+
+
 
 client.on("interactionCreate", async (interaction) => {
     if (interaction.isChatInputCommand()) {
