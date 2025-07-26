@@ -21,31 +21,44 @@ module.exports = {
       return interaction.reply({ content: "Invalid queue ID.", ephemeral: true });
     }
     
-    const queue = queues.get(id);
+    const newQueue = queues.get(id);
     const userId = interaction.user.id;
 
-    if (!queue) {
+    if (!newQueue) {
       return interaction.reply({ content: `Queue #${id} doesn't exist or is inactive.`, ephemeral: true });
     }
-    if (!queue.active) {
+    if (!newQueue.active) {
       return interaction.reply({ content: `Queue #${id} is closed and cannot be joined.`, ephemeral: true });
     }
-    if (queue.users.includes(userId)) {
+    if (newQueue.users.includes(userId)) {
       return interaction.reply({ content: `You're already in queue #${id}.`, ephemeral: true });
     }
-    if (queue.users.length >= queue.maxPlayers) {
+    if (newQueue.users.length >= newQueue.maxPlayers) {
       return interaction.reply({ content: `Queue #${id} is full.`, ephemeral: true });
     }
 
-    queue.users.push(userId);
+    for (const [otherId, queue] of queues.entries()) {
+      if (queue.id !== id && queue.active && queue.users.includes(userId)) {
+        queue.users = queue.users.filter(uid => uid !== userId);
+
+        if (queue.users.length === 0) {
+          queue.active = false;
+          queues.delete(queue.id);
+          console.log(`Queue #${queue.id} deleted after becoming empty from a switch.`);
+      }
+      break;
+    }
+  }
+
+    newQueue.users.push(userId);
 
     const embed = new EmbedBuilder()
-      .setTitle(`Queue #${id} (${queue.format})`)
-      .setDescription(`Players: ${queue.users.length}/${queue.maxPlayers}`)
+      .setTitle(`Queue #${id} (${newQueue.format})`)
+      .setDescription(`Players: ${newQueue.users.length}/${newQueue.maxPlayers}`)
       .addFields([
         { 
           name: "Users", 
-          value: queue.users.map((uid, i) => `${i + 1}. <@${uid}>`).join("\n") 
+          value: newQueue.users.map((uid, i) => `${i + 1}. <@${uid}>`).join("\n") 
         }
       ]);
 
